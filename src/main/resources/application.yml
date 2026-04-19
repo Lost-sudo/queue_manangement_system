@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  access_token_secret: ${ACCESS_TOKEN_SECRET}
+  access_token_expiry: ${ACCESS_TOKEN_EXPIRATION}
+  refresh_token_secret: ${REFRESH_TOKEN_SECRET}
+  refresh_token_expiry: ${REFRESH_TOKEN_EXPIRATION}
