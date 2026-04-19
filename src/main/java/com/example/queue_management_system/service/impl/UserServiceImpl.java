@@ -1,11 +1,13 @@
 package com.example.queue_management_system.service.impl;
 
+import com.example.queue_management_system.domain.RefreshToken;
 import com.example.queue_management_system.domain.Role;
 import com.example.queue_management_system.domain.User;
 import com.example.queue_management_system.dto.*;
 import com.example.queue_management_system.mapper.UserMapper;
 import com.example.queue_management_system.repository.UserRepository;
 import com.example.queue_management_system.security.JwtService;
+import com.example.queue_management_system.service.RefreshTokenService;
 import com.example.queue_management_system.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +26,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
+    @Override
     public UserResponse register(UserRegisterRequest request) {
         String email = request.getEmail();
         if (userRepository.findByEmail(email).isPresent()) {
@@ -65,12 +69,15 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtService.generateAccessToken(user.getEmail());
         String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
+        refreshTokenService.createRefreshToken(refreshToken, user.getEmail());
+
         return AuthServiceResponse.builder()
                 .token(accessToken)
                 .refreshToken(refreshToken)
                 .build();
     }
 
+    @Override
     public AuthServiceResponse refreshToken(HttpServletRequest request) {
         final String TYPE =  "refresh_token";
         String encodedRefreshToken = Arrays.stream(request.getCookies())
@@ -85,6 +92,14 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            RefreshToken token = refreshTokenService.getRefreshToken(refreshToken);
+
+            if (token.isRevoked()) {
+                throw new RuntimeException("Refresh token has been revoked");
+            } else {
+                refreshTokenService.revokeToken(refreshToken);
+            }
+
             UserDetails userDetails = org.springframework.security.core.userdetails.User.
                     withUsername(user.getEmail())
                     .password(user.getPassword())
@@ -97,6 +112,8 @@ public class UserServiceImpl implements UserService {
 
             String newAccessToken = jwtService.generateAccessToken(user.getEmail());
             String newRefreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+            refreshTokenService.createRefreshToken(newRefreshToken, user.getEmail());
 
             return AuthServiceResponse.builder()
                     .token(newAccessToken)
