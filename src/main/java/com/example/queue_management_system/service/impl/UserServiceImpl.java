@@ -89,9 +89,6 @@ public class UserServiceImpl implements UserService {
             String refreshToken = URLDecoder.decode(encodedRefreshToken, StandardCharsets.UTF_8);
             String email = jwtService.extractEmailFromToken(TYPE, refreshToken);
 
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
             RefreshToken token = refreshTokenService.getRefreshToken(refreshToken);
 
             if (token.isRevoked()) {
@@ -99,6 +96,9 @@ public class UserServiceImpl implements UserService {
             } else {
                 refreshTokenService.revokeToken(refreshToken);
             }
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             UserDetails userDetails = org.springframework.security.core.userdetails.User.
                     withUsername(user.getEmail())
