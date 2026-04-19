@@ -1,11 +1,10 @@
 package com.example.queue_management_system.service;
 
-import com.example.queue_management_system.dto.AuthResponse;
-import com.example.queue_management_system.dto.UserLoginRequest;
-import com.example.queue_management_system.dto.UserRegisterRequest;
-import com.example.queue_management_system.dto.UserResponse;
+import com.example.queue_management_system.dto.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface UserService {
     UserResponse register(UserRegisterRequest request);
-    AuthResponse login(UserLoginRequest request);
+    AuthServiceResponse login(UserLoginRequest request);
+    AuthServiceResponse refreshToken(HttpServletRequest request);
 }
