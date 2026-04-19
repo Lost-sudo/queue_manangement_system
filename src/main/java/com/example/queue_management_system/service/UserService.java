@@ -6,7 +6,6 @@ import com.example.queue_management_system.dto.UserRegisterRequest;
 import com.example.queue_management_system.dto.UserResponse;
 
 public interface UserService {
-    public UserResponse register(UserRegisterRequest request);
-    public AuthResponse login(UserLoginRequest request);
-
+    UserResponse register(UserRegisterRequest request);
+    AuthResponse login(UserLoginRequest request);
 }
