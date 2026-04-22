@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -122,5 +125,20 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error decoding refresh token", e);
         }
+    }
+
+    @Override
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream()
+                .map(UserMapper::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserResponse findById(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return UserMapper.toUserResponse(user);
     }
 }
