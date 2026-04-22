@@ -19,4 +19,10 @@ public class TestController {
     public String admin(){
         return "You are allowed to access this resource";
     }
+
+    @GetMapping("/staff")
+    @PreAuthorize("hasRole('STAFF')")
+    public String staff(){
+        return "You are allowed to access this resource";
+    }
 }

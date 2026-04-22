@@ -25,6 +25,10 @@ public class Counter {
     @JoinColumn(name = "service_id", nullable = false)
     private ServiceType service;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_staff_id")
+    private User assignedStaff;
+
     private Boolean isActive;
 
     @PrePersist

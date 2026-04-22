@@ -8,4 +8,5 @@ import java.util.UUID;
 public class CountersRequest {
     private String name;
     private UUID service_id;
+    private UUID assigned_staff_id;
 }
