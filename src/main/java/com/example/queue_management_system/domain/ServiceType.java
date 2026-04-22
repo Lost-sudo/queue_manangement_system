@@ -1,5 +1,6 @@
 package com.example.queue_management_system.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,7 @@ public class ServiceType {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "service")
+    @JsonIgnore
     private List<Counter> counters;
 
     @PrePersist

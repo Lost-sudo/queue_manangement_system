@@ -4,6 +4,9 @@ import com.example.queue_management_system.domain.Counter;
 import com.example.queue_management_system.domain.ServiceType;
 import com.example.queue_management_system.domain.User;
 import com.example.queue_management_system.dto.CountersRequest;
+import com.example.queue_management_system.dto.CountersResponse;
+import com.example.queue_management_system.mapper.ServiceTypeMapper;
+import com.example.queue_management_system.mapper.UserMapper;
 import com.example.queue_management_system.repository.CountersRepository;
 import com.example.queue_management_system.repository.ServiceTypeRepository;
 import com.example.queue_management_system.repository.UserRepository;
@@ -26,7 +29,7 @@ public class CountersServiceImpl implements CountersService {
     private final UserRepository userRepository;
 
     @Override
-    public Counter createCounter(CountersRequest request) {
+    public CountersResponse createCounter(CountersRequest request) {
         ServiceType serviceType = serviceTypeRepository.findById(request.getService_id())
                 .orElseThrow(() -> new RuntimeException("Service with id " + request.getService_id() + " not found"));
 
@@ -39,27 +42,51 @@ public class CountersServiceImpl implements CountersService {
                 .assignedStaff(user)
                 .build();
 
-        return countersRepository.save(counter);
+        Counter savedCounter = countersRepository.save(counter);
+
+        return CountersResponse.builder()
+                .id(savedCounter.getId())
+                .user(UserMapper.toUserResponse(user))
+                .serviceType(ServiceTypeMapper.toServiceTypeResponse(serviceType))
+                .build();
     }
 
     @Override
-    public List<Counter> getCounters() {
-        return countersRepository.findAll();
+    public List<CountersResponse> getCounters() {
+        List<Counter> counters = countersRepository.findAll();
+
+        return counters.stream()
+                .map(counter -> CountersResponse.builder()
+                        .id(counter.getId())
+                        .user(UserMapper.toUserResponse(counter.getAssignedStaff()))
+                        .serviceType(ServiceTypeMapper.toServiceTypeResponse(counter.getService()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Counter getCounter(UUID id) {
-        return countersRepository.findById(id)
+    public CountersResponse getCounter(UUID id) {
+        Counter counter =  countersRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Counter with id " + id + " not found"));
+
+        return CountersResponse.builder()
+                .id(counter.getId())
+                .user(UserMapper.toUserResponse(counter.getAssignedStaff()))
+                .serviceType(ServiceTypeMapper.toServiceTypeResponse(counter.getService()))
+                .build();
     }
 
     @Override
-    public List<Counter> getCounterByServiceId(UUID service_id) {
+    public List<CountersResponse> getAllCountersByServiceId(UUID service_id) {
         List<Counter> counters = countersRepository.findByServiceIdAndIsActiveTrue(service_id);
 
         return counters.stream()
-                .peek(counter -> counter.setIsActive(counter.getIsActive())).collect(Collectors.toList());
-
+                .map(counter -> CountersResponse.builder()
+                        .id(counter.getId())
+                        .user(UserMapper.toUserResponse(counter.getAssignedStaff()))
+                        .serviceType(ServiceTypeMapper.toServiceTypeResponse(counter.getService()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

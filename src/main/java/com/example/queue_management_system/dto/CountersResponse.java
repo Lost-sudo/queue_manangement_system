@@ -9,6 +9,6 @@ import java.util.UUID;
 @Builder
 public class CountersResponse {
     private UUID id;
-    private String name;
-    private String service_id;
+    private UserResponse user;
+    private ServiceTypeResponse serviceType;
 }
