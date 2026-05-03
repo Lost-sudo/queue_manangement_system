@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: queue-system
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration: ${JWT_EXPIRATION}
+    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
+
+server:
+  port: 8080
