@@ -144,7 +144,7 @@ flowchart TD
     B --> C[Set completed_at timestamp]
     C --> D[Broadcast 'ticket:completed' event]
     D --> E[Public display clears 'Now Serving']
-    D --> F[Student tracking page (if open) sees status change]
+    D --> F[Student tracking page sees status change]
     D --> G[Staff dashboard becomes ready for next]
     D --> H[Admin dashboard reflects new completed count]
 ```
@@ -173,12 +173,12 @@ flowchart TD
     A[Admin logs into Admin Panel] --> B[Select 'Office Management']
     B --> C{Action?}
     C --> D[Add/Edit Office]
-    C --> E[Add/Edit Service (linked to office)]
-    C --> F[Create/Edit Counter (assign staff)]
+    C --> E[Add/Edit Service for office]
+    C --> F[Create/Edit Counter and assign staff]
     D --> G[Save to database]
     E --> G
     F --> G
-    G --> H[Changes available to student join page & staff dashboards]
+    G --> H[Changes available to student join page and staff dashboards]
 ```
 
 ---
