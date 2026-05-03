@@ -117,6 +117,7 @@ flowchart TD
     I --> K[Student track page updates]
     I --> L[Staff dashboard shows current ticket]
 ```
+
 ---
 
 ## 4. Workflow 3: Staff Completes a Ticket (US-06)
@@ -147,6 +148,7 @@ flowchart TD
     D --> G[Staff dashboard becomes ready for next]
     D --> H[Admin dashboard reflects new completed count]
 ```
+
 ---
 ## 5. Workflow 4: Admin Configures Offices & Services (US-07)
 
@@ -178,6 +180,7 @@ flowchart TD
     F --> G
     G --> H[Changes available to student join page & staff dashboards]
 ```
+
 ---
 
 ## 6. Workflow 5: Real‑time Public Display Update (US-10)
