@@ -69,19 +69,19 @@ All design artifacts were created before writing any code.
 They are available in the `/docs` folder (or referenced as separate files):
 
 1. **User Stories** – All user roles, their goals, and acceptance criteria.  
-   *File: `docs/user-stories.md`*
+   *File: [docs/user-stories.md](docs/user-stories.md)*
 
 2. **Workflow Diagrams** – Visual flows for joining a queue, calling a ticket, completing a ticket, and admin configuration.  
-   *File: `docs/workflow-diagrams.md` (including Mermaid code)*
+   *File: [docs/workflow-diagrams.md](docs/workflow-diagrams.md) (including Mermaid code)*
 
 3. **Data Model (ER Diagram)** – Database schema with entities and relationships.  
-   *File: `docs/data-model.md`*
+   *File: [docs/data-model.md](docs/data-model.md)*
 
 4. **API Specification** – Full REST API and WebSocket events contract.  
-   *File: `docs/api-specification.md`*
+   *File: [docs/api-specification.md](docs/api-specification.md)*
 
 5. **Wireframes / UI Sketches** – Low‑fidelity layouts for every screen.  
-   *File: `docs/wireframes.md`*
+   *File: [docs/wireframes.md](docs/wireframes.md)*
 
 ---
 
