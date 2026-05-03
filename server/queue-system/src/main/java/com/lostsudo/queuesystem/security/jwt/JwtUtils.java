@@ -20,7 +20,7 @@ public class JwtUtils {
     @Value("${app.jwt.secret}")
     private String secret;
 
-    @Value("${app.jwt.access-token-expiration")
+    @Value("${app.jwt.access-token-expiration}")
     private Long accessTokenExpiration;
 
     private SecretKey getSigningKey() {
@@ -33,7 +33,7 @@ public class JwtUtils {
 
     public String generateAccessToken(UserDetailsImpl userPrincipal) {
         return Jwts.builder()
-                .subject(userPrincipal.getId().toString())
+                .subject(userPrincipal.getEmail())
                 .claim("roles", userPrincipal.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))

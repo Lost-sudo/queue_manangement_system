@@ -21,7 +21,7 @@ public class RefreshTokenService {
     @Value("${app.jwt.refresh-token-expiration}")
     private long refreshTokenExpirationMs;
 
-    public RefreshTokenRepository createRefreshTokenRepository(UUID userId) {
+    public RefreshToken createRefreshToken(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -32,7 +32,7 @@ public class RefreshTokenService {
                 .revoked(false)
                 .build();
 
-        return (RefreshTokenRepository) refreshTokenRepository.save(refreshToken);
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public RefreshToken verifyRefreshToken(String token) {

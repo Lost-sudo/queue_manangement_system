@@ -1,5 +1,6 @@
 package com.lostsudo.queuesystem;
 
+import com.lostsudo.queuesystem.config.DotenvConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class QueueSystemApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(QueueSystemApplication.class, args);
+        SpringApplication app = new SpringApplication(QueueSystemApplication.class);
+        app.addInitializers(new DotenvConfig());
+        app.run(args);
     }
 
 }
