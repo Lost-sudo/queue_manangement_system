@@ -1,11 +1,12 @@
 package com.lostsudo.queuesystem.controller;
 
 import com.lostsudo.queuesystem.dto.request.LoginRequest;
-import com.lostsudo.queuesystem.dto.request.RefreshTokenRequest;
 import com.lostsudo.queuesystem.dto.request.RegisterRequest;
 import com.lostsudo.queuesystem.dto.response.AuthResponse;
 import com.lostsudo.queuesystem.dto.response.MessageResponse;
 import com.lostsudo.queuesystem.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,18 +28,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        System.out.println("I was reach!");
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.login(request, response));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.refreshToken(request));
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.refreshToken(request, response));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<MessageResponse> logout(@Valid @RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authService.logout(request));
+    public ResponseEntity<MessageResponse> logout(@Valid @RequestBody HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(authService.logout(request, response));
     }
 }

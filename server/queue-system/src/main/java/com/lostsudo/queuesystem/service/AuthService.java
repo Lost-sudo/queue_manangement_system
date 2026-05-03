@@ -1,7 +1,6 @@
 package com.lostsudo.queuesystem.service;
 
 import com.lostsudo.queuesystem.dto.request.LoginRequest;
-import com.lostsudo.queuesystem.dto.request.RefreshTokenRequest;
 import com.lostsudo.queuesystem.dto.request.RegisterRequest;
 import com.lostsudo.queuesystem.dto.response.AuthResponse;
 import com.lostsudo.queuesystem.dto.response.MessageResponse;
@@ -13,14 +12,20 @@ import com.lostsudo.queuesystem.repository.RefreshTokenRepository;
 import com.lostsudo.queuesystem.repository.UserRepository;
 import com.lostsudo.queuesystem.security.jwt.JwtUtils;
 import com.lostsudo.queuesystem.security.services.UserDetailsImpl;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -58,7 +63,7 @@ public class AuthService {
         return MessageResponse.builder().message("User registered successfully!").build();
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
@@ -68,14 +73,33 @@ public class AuthService {
         String accessToken = jwtUtils.generateAccessToken(userDetails);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("strict")
+                .path("/auth")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+                .tokenType("Bearer")
                 .build();
     }
 
-    public AuthResponse refreshToken(RefreshTokenRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
+    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public AuthResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String requestRefreshToken = extractRefreshTokenFromCookie(request);
         RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(requestRefreshToken);
 
         refreshTokenService.revokeToken(refreshToken);
@@ -85,16 +109,39 @@ public class AuthService {
         String newAccessToken = jwtUtils.generateAccessToken(userDetails);
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
+        ResponseCookie newCookie = ResponseCookie.from("refreshToken", newRefreshToken.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("strict")
+                .path("/path")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, newCookie.toString());
+
+
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken.getToken())
+                .tokenType("Bearer")
                 .build();
     }
 
-    public MessageResponse logout(RefreshTokenRequest request) {
-        String tokenValue = request.getRefreshToken();
-        refreshTokenRepository.findByToken(tokenValue)
-                .ifPresent(refreshTokenService::revokeToken);
+    public MessageResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        String tokenValue = extractRefreshTokenFromCookie(request);
+        if (tokenValue != null) {
+            refreshTokenRepository.findByToken(tokenValue)
+                    .ifPresent(refreshTokenService::revokeToken);
+        }
+
+        ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("strict")
+                .path("/auth")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, clearCookie.toString());
+
         return MessageResponse.builder()
                 .message("Successfully logged out!")
                 .build();
